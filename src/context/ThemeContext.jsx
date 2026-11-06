@@ -13,6 +13,7 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
     localStorage.setItem('dz-theme', theme);
   }, [theme]);
 

@@ -41,7 +41,7 @@ export function ProfilePage() {
         </form>
         <aside className="profile-aside">
           <div className="profile-aside-card"><span className="profile-avatar large">{(profile?.name || user?.email || 'A').charAt(0).toUpperCase()}</span><strong>{profile?.name || 'Your account'}</strong><span>{user?.email}</span></div>
-          <div className="profile-quick-links"><Link to="/orders">View order history <span>↗</span></Link><button onClick={toggleTheme} type="button">{theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'} <span>{theme === 'dark' ? '☼' : '◐'}</span></button><button onClick={signOut} type="button">Sign out <span>↗</span></button></div>
+          <div className="profile-quick-links"><Link to="/orders">View order history <span>↗</span></Link><button aria-pressed={theme === 'dark'} onClick={toggleTheme} type="button">{theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'} <span>{theme === 'dark' ? '☼' : '◐'}</span></button><button onClick={signOut} type="button">Sign out <span>↗</span></button></div>
         </aside>
       </div>
     </div>

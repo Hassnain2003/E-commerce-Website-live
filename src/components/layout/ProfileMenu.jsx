@@ -23,7 +23,7 @@ export function ProfileMenu({ onClose }) {
       </div>
       <Link onClick={onClose} role="menuitem" to="/profile">Profile settings <span>↗</span></Link>
       <Link onClick={onClose} role="menuitem" to="/orders">Order history <span>↗</span></Link>
-      <button onClick={toggleTheme} role="menuitem" type="button">
+      <button aria-pressed={theme === 'dark'} onClick={toggleTheme} role="menuitem" type="button">
         {theme === 'dark' ? 'Use light theme' : 'Use dark theme'} <span>{theme === 'dark' ? '☼' : '◐'}</span>
       </button>
       <button className="profile-logout" onClick={handleSignOut} role="menuitem" type="button">Sign out <span>↗</span></button>

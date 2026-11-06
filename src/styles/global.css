@@ -3,6 +3,7 @@
 :root {
   color: #24211f;
   background: #f4f1eb;
+  color-scheme: light;
   font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -10,8 +11,13 @@
   --muted: #827a71;
   --paper: #f4f1eb;
   --paper-deep: #ebe6de;
+  --paper-raised: #faf8f4;
   --accent: #bd6546;
+  --accent-soft: rgba(189, 101, 70, 0.12);
   --line: rgba(36, 33, 31, 0.14);
+  --line-strong: rgba(36, 33, 31, 0.24);
+  --shadow-soft: 0 1.5rem 3rem rgba(36, 33, 31, 0.08);
+  --shadow-float: 0 1.5rem 4rem rgba(36, 33, 31, 0.16);
   --serif: "Playfair Display", Georgia, serif;
   --mono: "DM Mono", monospace;
 }
@@ -19,19 +25,30 @@
 [data-theme="dark"] {
   color: #eee9e1;
   background: #171514;
+  color-scheme: dark;
   --ink: #eee9e1;
   --muted: #a49b91;
   --paper: #171514;
-  --paper-deep: #26221f;
+  --paper-deep: #24201d;
+  --paper-raised: #2b2622;
+  --accent: #d98661;
+  --accent-soft: rgba(217, 134, 97, 0.15);
   --line: rgba(238, 233, 225, 0.16);
+  --line-strong: rgba(238, 233, 225, 0.28);
+  --shadow-soft: 0 1.5rem 3rem rgba(0, 0, 0, 0.24);
+  --shadow-float: 0 1.5rem 4rem rgba(0, 0, 0, 0.42);
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; min-width: 320px; }
+body { background: var(--paper); color: var(--ink); margin: 0; min-width: 320px; transition: background-color 240ms ease, color 240ms ease; }
 button, a { font: inherit; }
 button { cursor: pointer; }
 a { color: inherit; }
+::selection { background: var(--accent); color: var(--paper); }
+::-webkit-scrollbar { width: 0.65rem; }
+::-webkit-scrollbar-track { background: var(--paper); }
+::-webkit-scrollbar-thumb { background: var(--line-strong); border: 2px solid var(--paper); border-radius: 999px; }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
@@ -71,6 +88,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   margin: 0 auto;
   padding: 1.45rem clamp(1.25rem, 5vw, 5rem);
   width: 100%;
+  transition: border-color 240ms ease, background-color 240ms ease;
 }
 
 .brand { align-items: center; display: inline-flex; gap: 0.7rem; text-decoration: none; }
@@ -117,12 +135,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 .header-actions { align-items: center; display: flex; gap: 1rem; justify-content: flex-end; }
 .profile-control { position: relative; }
-.profile-trigger { align-items: center; background: transparent; border: 0; color: var(--ink); display: flex; gap: 0.45rem; padding: 0; }
+.profile-trigger { align-items: center; background: transparent; border: 0; color: var(--ink); display: flex; gap: 0.45rem; padding: 0.25rem; transition: color 180ms ease, transform 180ms ease; }
+.profile-trigger:hover { color: var(--accent); transform: translateY(-1px); }
 .profile-trigger-name { font-size: 0.72rem; max-width: 7rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .profile-avatar { align-items: center; background: var(--accent); border-radius: 50%; color: var(--paper); display: inline-flex; font-family: var(--mono); font-size: 0.75rem; height: 2.4rem; justify-content: center; width: 2.4rem; }
 .profile-avatar.small { background: transparent; border: 1px solid var(--ink); color: var(--ink); font-size: 0.58rem; height: 1.65rem; width: 1.65rem; }
 .profile-avatar.large { font-size: 1.2rem; height: 4.5rem; width: 4.5rem; }
-.profile-menu { animation: menu-in 160ms ease-out; background: var(--paper-deep); border: 1px solid var(--line); box-shadow: 0 1.5rem 3rem rgba(0,0,0,0.12); min-width: 17rem; padding: 1rem; position: absolute; right: 0; top: calc(100% + 1rem); z-index: 20; }
+.profile-menu { animation: menu-in 160ms ease-out; background: var(--paper-raised); border: 1px solid var(--line); box-shadow: var(--shadow-float); min-width: 17rem; padding: 1rem; position: absolute; right: 0; top: calc(100% + 1rem); z-index: 20; }
 .profile-menu-heading { align-items: center; border-bottom: 1px solid var(--line); display: flex; gap: 0.75rem; padding-bottom: 1rem; }
 .profile-menu-heading div { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
 .profile-menu-heading strong { font-size: 0.76rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -140,9 +159,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   font-size: 0.78rem;
   text-decoration: none;
 }
+.icon-button:hover, .bag-button:hover { color: var(--accent); }
 .icon-button { font-size: 1.35rem; line-height: 1; padding: 0; transform: rotate(-20deg); }
 .bag-button { align-items: center; display: flex; gap: 0.45rem; }
-.bag-count { align-items: center; border: 1px solid var(--ink); border-radius: 50%; display: inline-flex; font-family: var(--mono); font-size: 0.58rem; height: 1.3rem; justify-content: center; width: 1.3rem; }
+.bag-count { align-items: center; border: 1px solid currentColor; border-radius: 50%; display: inline-flex; font-family: var(--mono); font-size: 0.58rem; height: 1.3rem; justify-content: center; transition: background-color 180ms ease, color 180ms ease; width: 1.3rem; }
+.bag-button:hover .bag-count { background: var(--accent); border-color: var(--accent); color: var(--paper); }
 
 .page-content { flex: 1; padding: clamp(2.5rem, 7vw, 7rem) clamp(1.25rem, 8vw, 9rem); }
 
@@ -199,7 +220,7 @@ h1 {
 .hero-description { color: var(--muted); font-size: 1rem; line-height: 1.7; max-width: 28rem; }
 .line-link { border-bottom: 1px solid var(--ink); display: inline-flex; font-family: var(--mono); font-size: 0.68rem; gap: 2rem; letter-spacing: 0.1em; margin-top: 1.8rem; padding-bottom: 0.7rem; text-decoration: none; text-transform: uppercase; }
 .line-link span { color: var(--accent); font-size: 1rem; line-height: 0.7; }
-.hero-stamp { align-items: center; aspect-ratio: 1; background: var(--accent); border-radius: 50%; color: var(--paper); display: flex; flex-direction: column; justify-content: center; position: relative; transform: rotate(12deg); }
+.hero-stamp { align-items: center; aspect-ratio: 1; background: var(--accent); border-radius: 50%; box-shadow: var(--shadow-soft); color: var(--paper); display: flex; flex-direction: column; justify-content: center; position: relative; transform: rotate(12deg); }
 .hero-stamp::before { border: 1px solid rgba(244,241,235,0.5); border-radius: 50%; content: ""; height: 85%; position: absolute; width: 85%; }
 .hero-stamp span, .hero-stamp small { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em; }
 .hero-stamp strong { font-family: var(--serif); font-size: 2.5rem; font-weight: 400; letter-spacing: -0.07em; line-height: 0.8; margin: 1.5rem 0; text-align: center; }
@@ -216,11 +237,13 @@ h1 {
 .catalog-controls { align-items: center; display: flex; gap: 1rem; }
 .search-field { align-items: center; border-bottom: 1px solid var(--line); display: flex; gap: 0.5rem; }
 .search-field input { background: transparent; border: 0; color: var(--ink); font: inherit; font-size: 0.72rem; outline: 0; padding: 0.5rem 0; width: 8rem; }
+.search-field input::placeholder { color: var(--muted); opacity: 0.8; }
 .search-field span { color: var(--accent); font-size: 1.1rem; transform: rotate(-20deg); }
 .sort-field select { background: transparent; border: 0; color: var(--muted); font-family: var(--mono); font-size: 0.6rem; outline: 0; }
 .product-grid { display: grid; gap: 2.5rem 1.4rem; grid-template-columns: repeat(3, 1fr); }
 .product-card { min-width: 0; }
 .product-image-wrap { aspect-ratio: 0.82; background: var(--paper-deep); overflow: hidden; position: relative; }
+.product-image-wrap::after { background: linear-gradient(140deg, transparent 55%, rgba(255,255,255,0.12)); content: ""; inset: 0; pointer-events: none; position: absolute; }
 .product-image { height: 100%; object-fit: cover; transition: transform 500ms cubic-bezier(.2,.8,.2,1); width: 100%; }
 .product-card:hover .product-image { transform: scale(1.045); }
 .product-category { background: var(--paper); color: var(--muted); font-family: var(--mono); font-size: 0.56rem; left: 0.8rem; letter-spacing: 0.1em; padding: 0.45rem 0.6rem; position: absolute; text-transform: uppercase; top: 0.8rem; }
@@ -231,14 +254,16 @@ h1 {
 .product-price { font-family: var(--mono); font-size: 0.68rem; white-space: nowrap; }
 .add-button { background: transparent; border: 0; border-bottom: 1px solid var(--ink); font-size: 0.7rem; padding: 0 0 0.25rem; white-space: nowrap; }
 .add-button:hover { color: var(--accent); border-color: var(--accent); }
-.skeleton-card { aspect-ratio: 0.82; background: linear-gradient(90deg, var(--paper-deep), #f4f0e9, var(--paper-deep)); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+.skeleton-card { aspect-ratio: 0.82; background: linear-gradient(90deg, var(--paper-deep), var(--paper-raised), var(--paper-deep)); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
 @keyframes shimmer { to { background-position: -200% 0; } }
 .status-message { border: 1px solid var(--line); padding: 3rem; text-align: center; }
 .status-message > p:not(.eyebrow) { color: var(--muted); }
 .outline-button, .solid-button { align-items: center; display: inline-flex; font-size: 0.7rem; gap: 1rem; justify-content: center; letter-spacing: 0.06em; padding: 0.9rem 1.2rem; text-decoration: none; text-transform: uppercase; }
-.outline-button { background: transparent; border: 1px solid var(--ink); color: var(--ink); }
+.outline-button { background: transparent; border: 1px solid var(--ink); color: var(--ink); transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease; }
+.outline-button:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
 .solid-button { background: var(--ink); border: 1px solid var(--ink); color: var(--paper); cursor: pointer; }
-.solid-button:hover { background: var(--accent); border-color: var(--accent); }
+.solid-button { transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease; }
+.solid-button:hover { background: var(--accent); border-color: var(--accent); transform: translateY(-1px); }
 .solid-button:disabled { cursor: wait; opacity: 0.55; }
 .solid-button.full { width: 100%; }
 .sr-only { height: 1px; margin: -1px; overflow: hidden; position: absolute; width: 1px; clip: rect(0,0,0,0); }
