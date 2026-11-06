@@ -8,6 +8,7 @@ import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { OrderHistoryPage } from './pages/OrderHistoryPage';
+import { OrderDetailsPage } from './pages/OrderDetailsPage';
 import { ProductDetailsPage } from './pages/ProductDetailsPage';
 import { ProfilePage } from './pages/ProfilePage';
 
@@ -22,6 +23,7 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="checkout" element={<CheckoutPage />} />
           <Route path="orders" element={<OrderHistoryPage />} />
+          <Route path="orders/:orderId" element={<OrderDetailsPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
         <Route element={<ProtectedRoute adminOnly />}>
