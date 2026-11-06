@@ -8,6 +8,7 @@ Live site: [https://dz-cartique.web.app/](https://dz-cartique.web.app/)
 
 - Responsive fashion storefront
 - Firestore product catalog
+- Product metadata normalization for featured items, sale pricing, badges, tags, and stock states
 - Category filtering, search, and sorting
 - Persistent browser cart
 - Firebase email/password authentication
@@ -53,6 +54,19 @@ npm run dev
 ```
 
 The original static implementation is preserved under [`views/`](./views) as a migration reference.
+
+## Product fields
+
+Existing product documents only need `name`, `description`, `price`, `category`, and optionally `imageUrl`. The storefront also supports these optional fields:
+
+- `featured`: Boolean used by the default catalog sort.
+- `salePrice`: Numeric price lower than `price`.
+- `compareAtPrice`: Original numeric price for future merchandising.
+- `badge`: Short label such as `New` or `Limited`.
+- `tags`: Array of searchable product tags.
+- `stock`: Numeric inventory value; `0` displays a sold-out state.
+
+Products are normalized at the service boundary so older documents remain compatible with the richer catalog experience.
 
 ## Production build
 

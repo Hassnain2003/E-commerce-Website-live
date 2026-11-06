@@ -1,17 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { ProductCard } from '../components/store/ProductCard';
 import { StatusMessage } from '../components/ui/StatusMessage';
-import { fetchProducts } from '../services/products';
-
-const categories = [
-  { value: 'all', label: 'All pieces' },
-  { value: 'shirts', label: 'Shirts' },
-  { value: 'tshirts', label: 'T-shirts' },
-  { value: 'pants-jeans', label: 'Pants & denim' },
-  { value: 'ethnic-wear', label: 'Ethnic wear' },
-  { value: 'jackets-hoodies', label: 'Layers' },
-];
+import { CATEGORY_LABELS, fetchProducts } from '../services/products';
 
 export function HomePage() {
   const [products, setProducts] = useState([]);
@@ -33,6 +23,14 @@ export function HomePage() {
 
   useEffect(() => { loadProducts(); }, []);
 
+  const categories = useMemo(() => {
+    const available = [...new Set(products.map((product) => product.category).filter(Boolean))];
+    return [
+      { value: 'all', label: 'All pieces' },
+      ...available.map((value) => ({ value, label: CATEGORY_LABELS[value] || value.replaceAll('-', ' ') })),
+    ];
+  }, [products]);
+
   const visibleProducts = useMemo(() => {
     const filtered = products.filter((product) => {
       const matchesCategory = category === 'all' || product.category === category;
@@ -42,9 +40,16 @@ export function HomePage() {
     return [...filtered].sort((a, b) => {
       if (sort === 'price-low') return Number(a.price || 0) - Number(b.price || 0);
       if (sort === 'price-high') return Number(b.price || 0) - Number(a.price || 0);
-      return 0;
+      if (sort === 'featured') return Number(b.featured) - Number(a.featured) || b.createdAtValue - a.createdAtValue;
+      return b.createdAtValue - a.createdAtValue;
     });
   }, [category, products, search, sort]);
+
+  function clearFilters() {
+    setCategory('all');
+    setSearch('');
+    setSort('featured');
+  }
 
   return (
     <div className="shop-page">
@@ -90,9 +95,10 @@ export function HomePage() {
             </label>
           </div>
         </div>
+        {(category !== 'all' || search) && <div className="active-filters"><span>Showing {visibleProducts.length} of {products.length}</span><button onClick={clearFilters} type="button">Clear filters ×</button></div>}
         {status === 'loading' && <div className="product-grid"><div className="skeleton-card" /><div className="skeleton-card" /><div className="skeleton-card" /></div>}
         {status === 'error' && <StatusMessage action={<button className="outline-button" onClick={loadProducts} type="button">Try again</button>} description="We couldn't load the collection right now. Check your connection and try again." title="Something went quiet" />}
-        {status === 'ready' && visibleProducts.length === 0 && <StatusMessage action={<Link className="outline-button" to="/">Clear filters</Link>} description="Try another search or browse a different category." title="No pieces found" />}
+        {status === 'ready' && visibleProducts.length === 0 && <StatusMessage action={<button className="outline-button" onClick={clearFilters} type="button">Clear filters</button>} description="Try another search or browse a different category." title="No pieces found" />}
         {status === 'ready' && visibleProducts.length > 0 && <div className="product-grid">{visibleProducts.map((product) => <ProductCard key={product.id} product={product} />)}</div>}
       </section>
     </div>

@@ -6,12 +6,14 @@ export function ProductCard({ product }) {
   const [added, setAdded] = useState(false);
   const fallbackImage = `https://placehold.co/800x1000/e6dfd5/24211f?text=${encodeURIComponent(product.name)}`;
   const image = product.imageUrl || fallbackImage;
+  const isSoldOut = product.stock === 0;
 
   function handleAdd() {
+    if (isSoldOut) return;
     addItem({
       id: product.id,
       name: product.name,
-      price: Number(product.price) || 0,
+      price: product.currentPrice,
       imageUrl: product.imageUrl || '',
     });
     setAdded(true);
@@ -22,7 +24,8 @@ export function ProductCard({ product }) {
     <article className="product-card">
       <div className="product-image-wrap">
         <img src={image} alt={product.name} className="product-image" onError={(event) => { event.currentTarget.src = fallbackImage; }} />
-        <span className="product-category">{product.category || 'Essential'}</span>
+        <span className="product-category">{product.badge || product.category || 'Essential'}</span>
+        {isSoldOut && <span className="product-stock-badge">Sold out</span>}
       </div>
       <div className="product-card-body">
         <div>
@@ -30,9 +33,12 @@ export function ProductCard({ product }) {
           <p>{product.description || 'Made for your everyday rotation.'}</p>
         </div>
         <div className="product-card-footer">
-          <span className="product-price">PKR {Number(product.price || 0).toLocaleString()}</span>
-          <button className="add-button" onClick={handleAdd} type="button">
-            {added ? 'Added' : 'Add +'}
+          <span className="product-price">
+            {product.salePrice && <del>PKR {product.price.toLocaleString()}</del>}
+            PKR {product.currentPrice.toLocaleString()}
+          </span>
+          <button aria-disabled={isSoldOut} className="add-button" disabled={isSoldOut} onClick={handleAdd} type="button">
+            {isSoldOut ? 'Sold out' : added ? 'Added' : 'Add +'}
           </button>
         </div>
       </div>
