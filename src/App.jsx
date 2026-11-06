@@ -8,6 +8,7 @@ import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { OrderHistoryPage } from './pages/OrderHistoryPage';
+import { ProductDetailsPage } from './pages/ProductDetailsPage';
 import { ProfilePage } from './pages/ProfilePage';
 
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
     <Routes>
       <Route element={<AppShell />}>
         <Route index element={<HomePage />} />
+        <Route path="products/:productId" element={<ProductDetailsPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="cart" element={<CartPage />} />
         <Route element={<ProtectedRoute />}>

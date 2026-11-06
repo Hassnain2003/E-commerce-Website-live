@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 
 export function ProductCard({ product }) {
@@ -8,7 +9,8 @@ export function ProductCard({ product }) {
   const image = product.imageUrl || fallbackImage;
   const isSoldOut = product.stock === 0;
 
-  function handleAdd() {
+  function handleAdd(event) {
+    event.stopPropagation();
     if (isSoldOut) return;
     addItem({
       id: product.id,
@@ -22,26 +24,28 @@ export function ProductCard({ product }) {
 
   return (
     <article className="product-card">
-      <div className="product-image-wrap">
-        <img src={image} alt={product.name} className="product-image" onError={(event) => { event.currentTarget.src = fallbackImage; }} />
-        <span className="product-category">{product.badge || product.category || 'Essential'}</span>
-        {isSoldOut && <span className="product-stock-badge">Sold out</span>}
-      </div>
-      <div className="product-card-body">
-        <div>
-          <h3>{product.name}</h3>
-          <p>{product.description || 'Made for your everyday rotation.'}</p>
+      <Link className="product-card-link" to={`/products/${product.id}`} aria-label={`View ${product.name} details`}>
+        <div className="product-image-wrap">
+          <img src={image} alt={product.name} className="product-image" loading="lazy" onError={(event) => { event.currentTarget.src = fallbackImage; }} />
+          <span className="product-category">{product.badge || product.category || 'Essential'}</span>
+          {isSoldOut && <span className="product-stock-badge">Sold out</span>}
         </div>
-        <div className="product-card-footer">
-          <span className="product-price">
-            {product.salePrice && <del>PKR {product.price.toLocaleString()}</del>}
-            PKR {product.currentPrice.toLocaleString()}
-          </span>
-          <button aria-disabled={isSoldOut} className="add-button" disabled={isSoldOut} onClick={handleAdd} type="button">
-            {isSoldOut ? 'Sold out' : added ? 'Added' : 'Add +'}
-          </button>
+        <div className="product-card-body">
+          <div>
+            <h3>{product.name}</h3>
+            <p>{product.description || 'Made for your everyday rotation.'}</p>
+          </div>
+          <div className="product-card-footer">
+            <span className="product-price">
+              {product.salePrice && <del>PKR {product.price.toLocaleString()}</del>}
+              PKR {product.currentPrice.toLocaleString()}
+            </span>
+            <button aria-disabled={isSoldOut} className="add-button" disabled={isSoldOut} onClick={handleAdd} type="button">
+              {isSoldOut ? 'Sold out' : added ? 'Added' : 'Add +'}
+            </button>
+          </div>
         </div>
-      </div>
+      </Link>
     </article>
   );
 }

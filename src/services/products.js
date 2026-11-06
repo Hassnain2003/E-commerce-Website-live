@@ -1,4 +1,4 @@
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from './firebase';
 
 export const CATEGORY_LABELS = {
@@ -39,4 +39,10 @@ export function normalizeProduct(product) {
 export async function fetchProducts() {
   const snapshot = await getDocs(query(collection(db, 'products'), orderBy('createdAt', 'desc')));
   return snapshot.docs.map((product) => normalizeProduct({ id: product.id, ...product.data() }));
+}
+
+export async function fetchProductById(productId) {
+  const productDoc = await getDoc(doc(db, 'products', productId));
+  if (!productDoc.exists()) return null;
+  return normalizeProduct({ id: productDoc.id, ...productDoc.data() });
 }
