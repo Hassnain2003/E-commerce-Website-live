@@ -317,7 +317,7 @@ export function AdminPage() {
                         <button className="admin-product-icon" onClick={() => startEditProduct(product)} aria-label={`Edit ${product.name}`} type="button">
                           <span aria-hidden="true">✎</span>
                         </button>
-                        <button className="admin-product-icon admin-product-icon--danger" onClick={() => startEditProduct(product)} aria-label={`Delete ${product.name}`} type="button">
+                        <button className="admin-product-icon admin-product-icon--danger" onClick={() => removeProduct()} aria-label={`Delete ${product.name}`} type="button">
                           <span aria-hidden="true">✕</span>
                         </button>
                       </div>
