@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { CartLineItem } from '../components/store/CartLineItem';
 import { useCart } from '../context/CartContext';
+import { shippingFor, FREE_DELIVERY_THRESHOLD } from '../services/orders';
 
 export function CartPage() {
   const { items, subtotal } = useCart();
-  const shipping = items.length ? 5 : 0;
+  const shipping = shippingFor(subtotal);
 
   return (
     <div className="inner-page cart-page">
@@ -28,7 +29,14 @@ export function CartPage() {
             <div className="summary-row"><span>Delivery</span><strong>PKR {shipping.toLocaleString()}</strong></div>
             <div className="summary-total"><span>Total</span><strong>PKR {(subtotal + shipping).toLocaleString()}</strong></div>
             <Link className="solid-button full" to="/checkout">Continue to checkout <span>↗</span></Link>
-            <p className="summary-note">Free delivery on orders over PKR 20,000.</p>
+            {shipping === 0 ? (
+              <p className="summary-note">Delivery is free on this order.</p>
+            ) : (
+              <>
+                <p className="summary-note">Free delivery on orders over PKR {FREE_DELIVERY_THRESHOLD.toLocaleString()}.</p>
+                {subtotal > 0 && subtotal < FREE_DELIVERY_THRESHOLD && <p className="summary-note">Add PKR {(FREE_DELIVERY_THRESHOLD - subtotal).toLocaleString()} more for free delivery.</p>}
+              </>
+            )}
           </aside>
         </div>
       )}

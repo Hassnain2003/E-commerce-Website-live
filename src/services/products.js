@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, orderBy, query } from 'firebase/firestore';
+import { collection, doc, documentId, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { db } from './firebase';
 
 export const CATEGORY_LABELS = {
@@ -48,4 +48,11 @@ export async function fetchProductById(productId) {
   const productDoc = await getDoc(doc(db, 'products', productId));
   if (!productDoc.exists()) return null;
   return normalizeProduct({ id: productDoc.id, ...productDoc.data() });
+}
+
+export async function fetchProductsByIds(productIds) {
+  const ids = productIds.filter((id) => typeof id === 'string' && id);
+  if (!ids.length) return [];
+  const snapshot = await getDocs(query(collection(db, 'products'), where(documentId(), 'in', ids)));
+  return snapshot.docs.map((productDoc) => normalizeProduct({ id: productDoc.id, ...productDoc.data() }));
 }

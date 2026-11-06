@@ -491,3 +491,11 @@ h1 {
   .filter-drawer-panel { width: min(96vw, 32rem); margin: 0.75rem; padding: 1.25rem; }
   .filter-chip { font-size: 0.58rem; padding: 0.25rem 0.6rem; }
 }
+
+.confirmation-state .order-summary { border: 1px solid var(--line); border-radius: 0.4rem; margin: 1.5rem 0; padding: 1rem; }
+.confirmation-state .checkout-item { align-items: center; border-bottom: 1px solid var(--line-deep); display: flex; justify-content: space-between; padding: 0.6rem 0; }
+.confirmation-state .checkout-item:last-child { border-bottom: 0; }
+.confirmation-state p { color: var(--muted); font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.05em; margin: 0.4rem 0; text-transform: uppercase; }
+
+:root { --line-deep: rgba(36, 33, 31, 0.2); }
+[data-theme="dark"] { --line-deep: rgba(238, 233, 225, 0.18); }
