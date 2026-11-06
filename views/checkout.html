@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - D&Z Cartique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header>
+<a href="index.html" class="logo">
+    <h1>D&Z Cartique</h1>
+</a>
+
+        <div class="header-links">
+            <a href="index.html">Home</a>
+            <a href="#">Shop</a>
+            <a href="cart.html">Cart <span class="cart-counter">0</span></a>
+            <div class="profile-dropdown">
+                <a href="#" class="profile-link">
+                    <i class="fas fa-user"></i>
+                    <span class="username">Guest</span>
+                </a>
+                <div class="dropdown-content">
+                    <div class="user-info">
+                        <p>Welcome, <span class="username">Guest</span></p>
+                    </div>
+                    <a href="orderhistory.html"><i class="fas fa-history"></i> Order History</a>
+                    <a href="#" id="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Checkout Content -->
+    <div class="checkout-container">
+        <div class="checkout-form">
+            <div id="checkout-form-content">
+                <h2 class="section-title">Shipping Information</h2>
+                <div class="form-group">
+                    <label for="full-name">Full Name</label>
+                    <input type="text" id="full-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Shipping Address</label>
+                    <textarea id="address" required></textarea>
+                </div>
+
+                <h2 class="section-title">Payment Method</h2>
+                <div class="payment-method">
+                    <div class="payment-option">
+                        <input type="radio" id="cod" name="payment" value="cod" checked>
+                        <label for="cod">Cash on Delivery (COD)</label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" id="card" name="payment" value="card">
+                        <label for="card">Credit/Debit Card</label>
+                    </div>
+
+                    <div id="card-details" class="payment-details">
+                        <div class="card-details">
+                            <div class="form-group">
+                                <label for="card-number">Card Number</label>
+                                <input type="text" id="card-number" placeholder="1234 5678 9012 3456">
+                            </div>
+                            <div class="form-group">
+                                <label for="card-expiry">Expiry Date</label>
+                                <input type="text" id="card-expiry" placeholder="MM/YY">
+                            </div>
+                            <div class="form-group">
+                                <label for="card-cvv">CVV</label>
+                                <input type="text" id="card-cvv" placeholder="123">
+                            </div>
+                            <div class="form-group">
+                                <label for="card-name">Name on Card</label>
+                                <input type="text" id="card-name" placeholder="John Doe">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="place-order-btn" class="place-order-btn">Place Order</button>
+            </div>
+
+            <div id="confirmation-message" class="confirmation-message">
+                <i class="fas fa-check-circle"></i>
+                <h2>Order Confirmed!</h2>
+                <p>Thank you for your purchase. Your order has been placed successfully.</p>
+                <p>Order ID: <span id="order-id"></span></p>
+                <a href="index.html" class="back-to-home">Back to Home</a>
+            </div>
+        </div>
+
+        <div class="checkout-summary">
+            <h2 class="section-title">Order Summary</h2>
+            <div id="order-summary-items">
+                <!-- Order items will be dynamically inserted here -->
+            </div>
+            <div class="order-summary-item">
+                <span>Subtotal</span>
+                <span id="order-subtotal">$0.00</span>
+            </div>
+            <div class="order-summary-item">
+                <span>Shipping</span>
+                <span>$5.00</span>
+            </div>
+            <div class="order-summary-item order-total">
+                <span>Total</span>
+                <span id="order-total">$0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2025 D&Z Cartique. All rights reserved.</p>
+        <div>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact Us</a>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVtKArFOnaNNSY1nEESXB3cU0uozrjObQ",
+            authDomain: "dz-cartique.firebaseapp.com",
+            projectId: "dz-cartique",
+            storageBucket: "dz-cartique.appspot.com",
+            messagingSenderId: "558727334092",
+            appId: "1:558727334092:web:c5d3dee02a66e2a8c8da69"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Check authentication state
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        document.querySelectorAll('.username').forEach(el => {
+                            el.textContent = userData.name || user.email;
+                        });
+
+                        // Pre-fill user details
+                        document.getElementById('full-name').value = userData.name || '';
+                        document.getElementById('email').value = user.email || '';
+                        document.getElementById('phone').value = userData.phone || '';
+                        document.getElementById('address').value = userData.address || '';
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                }
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Logout functionality
+        document.getElementById("logout").addEventListener("click", async (e) => {
+            e.preventDefault();
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error("Logout error:", error);
+            }
+        });
+
+        // Payment method toggle
+        document.querySelectorAll('input[name="payment"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                document.getElementById('card-details').style.display =
+                    e.target.value === 'card' ? 'block' : 'none';
+            });
+        });
+
+        // Load order summary
+        function loadOrderSummary() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const orderSummary = document.getElementById('order-summary-items');
+            let subtotal = 0;
+
+            orderSummary.innerHTML = '';
+
+            if (cart.length === 0) {
+                window.location.href = 'cart.html';
+                return;
+            }
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+
+                const itemElement = document.createElement('div');
+                itemElement.className = 'order-summary-item';
+                itemElement.innerHTML = `
+                    <span>${item.name} × ${item.quantity}</span>
+                    <span>$${itemTotal.toFixed(2)}</span>
+                `;
+                orderSummary.appendChild(itemElement);
+            });
+
+            document.getElementById('order-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('order-total').textContent = `$${(subtotal + 5).toFixed(2)}`;
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            document.querySelector('.cart-counter').textContent = count;
+        }
+
+        // Place order
+        document.getElementById('place-order-btn').addEventListener('click', async () => {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart.length === 0) {
+                alert('Your cart is empty');
+                return;
+            }
+
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+            const cardDetails = paymentMethod === 'card' ? {
+                cardNumber: document.getElementById('card-number').value,
+                cardExpiry: document.getElementById('card-expiry').value,
+                cardCVV: document.getElementById('card-cvv').value,
+                cardName: document.getElementById('card-name').value
+            } : null;
+
+            if (paymentMethod === 'card' && (!cardDetails.cardNumber || !cardDetails.cardExpiry || !cardDetails.cardCVV || !cardDetails.cardName)) {
+                alert('Please enter all card details');
+                return;
+            }
+
+            const user = auth.currentUser;
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                // Calculate order total
+                const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+                const total = subtotal + 5; // $5 shipping
+
+                // Create order data
+                const orderData = {
+                    userId: user.uid,
+                    items: cart,
+                    shippingInfo: {
+                        name: document.getElementById('full-name').value,
+                        email: document.getElementById('email').value,
+                        phone: document.getElementById('phone').value,
+                        address: document.getElementById('address').value
+                    },
+                    paymentMethod: paymentMethod,
+                    paymentDetails: paymentMethod === 'card' ? {
+                        last4: cardDetails.cardNumber.slice(-4)
+                    } : null,
+                    subtotal: subtotal,
+                    shipping: 5,
+                    total: total,
+                    status: 'processing',
+                    createdAt: serverTimestamp()
+                };
+
+                // Add order to Firestore
+                const ordersRef = collection(db, 'orders');
+                const newOrderRef = doc(ordersRef);
+                await setDoc(newOrderRef, orderData);
+
+                // Show confirmation
+                document.getElementById('checkout-form-content').style.display = 'none';
+                document.getElementById('confirmation-message').style.display = 'block';
+                document.getElementById('order-id').textContent = newOrderRef.id;
+
+                // Clear cart
+                localStorage.removeItem('cart');
+                updateCartCount();
+            } catch (error) {
+                console.error("Error placing order:", error);
+                alert("An error occurred while placing your order. Please try again.");
+            }
+        });
+
+        // Initialize the page
+        loadOrderSummary();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | D&Z Cartique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-md: 0 10px 15px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f9fafb;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .login-container {
+            display: flex;
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .login-form-container {
+            flex: 1;
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-header {
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .login-header h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            color: var(--gray);
+        }
+
+        .logo {
+            margin-bottom: 1.5rem;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        form {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: #f8fafc;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background: white;
+        }
+
+        .forgot-password {
+            display: block;
+            text-align: right;
+            margin-top: -0.75rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        button[type="submit"],
+        .auth-toggle-btn {
+            width: 100%;
+            padding: 0.875rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        button[type="submit"] {
+            background: var(--primary);
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        button[type="submit"]:hover {
+            background: var(--primary-dark);
+        }
+
+        .auth-toggle-btn {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .auth-toggle-btn:hover {
+            background: #f8fafc;
+        }
+
+        .login-image {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: white;
+        }
+
+        .login-content {
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-content h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-content p {
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .dot.active {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        /* Registration Form */
+        #register-container {
+            display: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .login-container {
+                flex-direction: column;
+            }
+
+            .login-image {
+                order: -1;
+                padding: 3rem 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .login-form-container {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-form-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-form-container">
+            <div class="logo">
+                <h1>D&Z Cartique</h1>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="auth-container">
+                <div class="login-header">
+                    <h1>Welcome Back</h1>
+                    <p>Sign in to your account to continue</p>
+                </div>
+                
+                <form id="auth-form">
+                    <div class="form-group">
+                        <label for="user">Email</label>
+                        <input type="email" id="user" name="user" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                        <a href="#" id="forgot-password" class="forgot-password">Forgot password?</a>
+                    </div>
+                    
+                    <button type="submit">Login</button>
+                    <button type="button" id="register-button" class="auth-toggle-btn">Create an account</button>
+                </form>
+            </div>
+            
+            <!-- Registration Form -->
+            <div id="register-container">
+                <div class="login-header">
+                    <h1>Create Account</h1>
+                    <p>Join us to start shopping</p>
+                </div>
+                
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-name">Full Name</label>
+                        <input type="text" id="register-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-phone">Phone Number</label>
+                        <input type="tel" id="register-phone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-address">Address</label>
+                        <textarea id="register-address" class="input" required style="height: 100px;"></textarea>
+                    </div>
+                    
+                    <button type="button" id="submit-register">Register</button>
+                    <button type="button" id="back-to-login" class="auth-toggle-btn">Back to Login</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="login-image">
+            <div class="login-content">
+                <h2>D&Z Cartique</h2>
+                <p>Established in May 2025, our e-commerce website was founded by Trio — Asad, Suleman, and Hassnain — students of BSIT-5A at Bahria University.</p>
+                
+                <div class="dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            sendPasswordResetEmail,
+            signInWithEmailAndPassword
+        } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc
+        } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVtKArFOnaNNSY1nEESXB3cU0uozrjObQ",
+            authDomain: "dz-cartique.firebaseapp.com",
+            projectId: "dz-cartique",
+            storageBucket: "dz-cartique.appspot.com",
+            messagingSenderId: "558727334092",
+            appId: "1:558727334092:web:c5d3dee02a66e2a8c8da69"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Handle Login
+        document.getElementById("auth-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById("user").value.trim();
+            const password = document.getElementById("password").value.trim();
+            
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                window.location.href = "index.html";
+            } catch (error) {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                
+                if (errorCode === 'auth/invalid-email') {
+                    alert("Invalid email format.");
+                } else if (errorCode === 'auth/user-not-found') {
+                    alert("No user found with this email.");
+                } else if (errorCode === 'auth/wrong-password') {
+                    alert("Incorrect password.");
+                } else {
+                    alert(`Login error: ${errorMessage}`);
+                }
+            }
+        });
+
+        // Forgot Password Logic
+        document.getElementById("forgot-password").addEventListener("click", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("user").value.trim();
+            if (!email) {
+                alert("Please enter your email address to reset your password.");
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert("Password reset email sent. Please check your inbox.");
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Failed to send reset email. Please try again.");
+            }
+        });
+        
+        // Toggle between Login and Registration Forms
+        const authContainer = document.getElementById("auth-container");
+        const registerContainer = document.getElementById("register-container");
+        const registerButton = document.getElementById("register-button");
+        const backToLoginButton = document.getElementById("back-to-login");
+
+        registerButton.addEventListener("click", () => {
+            authContainer.style.display = "none";
+            registerContainer.style.display = "block";
+        });
+
+        backToLoginButton.addEventListener("click", () => {
+            registerContainer.style.display = "none";
+            authContainer.style.display = "block";
+        });
+
+        // Handle Registration
+        document.getElementById("submit-register").addEventListener("click", async () => {
+            const name = document.getElementById("register-name").value.trim();
+            const email = document.getElementById("register-email").value.trim();
+            const password = document.getElementById("register-password").value.trim();
+            const phone = document.getElementById("register-phone").value.trim();
+            const address = document.getElementById("register-address").value.trim();
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Store additional user data in Firestore
+                await setDoc(doc(db, "users", user.uid), {
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    address: address,
+                    uid: user.uid,
+                     role: "user",
+                    createdAt: new Date().toISOString()
+                });
+
+                alert(`Account created successfully for ${name}!`);
+                window.location.href = "index.html";
+            } catch (error) {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+
+                if (errorCode === 'auth/weak-password') {
+                    alert("Error: Password should be at least 6 characters.");
+                } else if (errorCode === 'auth/email-already-in-use') {
+                    alert("Error: This email is already in use.");
+                } else {
+                    alert(`Error: ${errorMessage}`);
+                }
+            }
+        });
+
+        // Slide Logic (For the About Section)
+        let currentSlide = 0;
+        const slides = [
+            "Established in May 2025, our e-commerce website was founded by Trio — Asad, Suleman, and Hassnain — students of BSIT-5A at Bahria University.",
+            "We operate as a fully online store, focused on launching our own aesthetic shirt brand. Our goal is to offer stylish, trendy shirts at affordable prices."
+        ];
+        const dots = document.querySelectorAll('.dot');
+        const loginContent = document.querySelector('.login-content p');
+
+        function goToSlide(n) {
+            dots[currentSlide].classList.remove('active');
+            currentSlide = (n + slides.length) % slides.length;
+            dots[currentSlide].classList.add('active');
+            loginContent.textContent = slides[currentSlide];
+        }
+
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => goToSlide(index));
+        });
+
+        setInterval(() => {
+            goToSlide(currentSlide + 1);
+        }, 5000);
+    </script>
+</body>
+</html>

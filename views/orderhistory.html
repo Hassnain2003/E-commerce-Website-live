@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History - D&Z Cartique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <link rel="stylesheet" href="style.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* Header Styles (same as index.html) */
+        header {
+            background-color: #2ba14b;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .header-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .header-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .cart-counter {
+            background-color: #ff5722;
+            color: white;
+            border-radius: 50%;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            margin-left: 0.3rem;
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            z-index: 1;
+            padding: 1rem;
+            color: #333;
+        }
+
+        .profile-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Order History Content */
+        .order-history-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .order-history-title {
+            font-size: 2rem;
+            color: #2ba14b;
+            margin-bottom: 2rem;
+        }
+
+        .order-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-id {
+            font-weight: 600;
+            color: #2ba14b;
+        }
+
+        .order-date {
+            color: #666;
+        }
+
+        .order-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-processing {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-shipped {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .order-details {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .order-items {
+            flex: 2;
+        }
+
+        .order-summary {
+            flex: 1;
+            background-color: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .order-item {
+            display: flex;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 1.5rem;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-price {
+            color: #2ba14b;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+        }
+
+        .summary-total {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #ddd;
+        }
+
+        .empty-orders {
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+        .empty-orders i {
+            font-size: 3rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+        }
+
+        .empty-orders p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .continue-shopping {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background-color: #2ba14b;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .continue-shopping:hover {
+            background-color: #24893c;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+        }
+
+        footer a {
+            color: #ccc;
+            text-decoration: none;
+            margin: 0 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .order-details {
+                flex-direction: column;
+            }
+
+            .order-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .order-item {
+                flex-direction: column;
+            }
+
+            .item-image {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+<a href="index.html" class="logo">
+    <h1>D&Z Cartique</h1>
+</a>
+
+        <div class="header-links">
+            <a href="index.html">Home</a>
+            <a href="#">Shop</a>
+            <a href="cart.html">Cart <span class="cart-counter">0</span></a>
+            <div class="profile-dropdown">
+                <a href="#" class="profile-link">
+                    <i class="fas fa-user"></i>
+                    <span class="username">Guest</span>
+                </a>
+                <div class="dropdown-content">
+                    <div class="user-info">
+                        <p>Welcome, <span class="username">Guest</span></p>
+                    </div>
+                    <a href="orderhistory.html"><i class="fas fa-history"></i> Order History</a>
+                    <a href="#" id="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Order History Content -->
+    <div class="order-history-container">
+        <h1 class="order-history-title">Your Order History</h1>
+        <div id="orders-container">
+            <!-- Orders will be dynamically inserted here -->
+            <div class="empty-orders">
+                <i class="fas fa-box-open"></i>
+                <p>You haven't placed any orders yet</p>
+                <a href="index.html" class="continue-shopping">Continue Shopping</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2025 D&Z Cartique. All rights reserved.</p>
+        <div>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact Us</a>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVtKArFOnaNNSY1nEESXB3cU0uozrjObQ",
+            authDomain: "dz-cartique.firebaseapp.com",
+            projectId: "dz-cartique",
+            storageBucket: "dz-cartique.appspot.com",
+            messagingSenderId: "558727334092",
+            appId: "1:558727334092:web:c5d3dee02a66e2a8c8da69"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Check authentication state
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    // Get user data
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        document.querySelectorAll('.username').forEach(el => {
+                            el.textContent = userData.name || user.email;
+                        });
+                    }
+
+                    // Load user's orders
+                    loadOrders(user.uid);
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Logout functionality
+        document.getElementById("logout").addEventListener("click", async (e) => {
+            e.preventDefault();
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error("Logout error:", error);
+            }
+        });
+
+        // Load orders from Firestore
+        async function loadOrders(userId) {
+            const ordersContainer = document.getElementById('orders-container');
+            
+            try {
+                const q = query(collection(db, "orders"), where("userId", "==", userId));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    ordersContainer.innerHTML = `
+                        <div class="empty-orders">
+                            <i class="fas fa-box-open"></i>
+                            <p>You haven't placed any orders yet</p>
+                            <a href="index.html" class="continue-shopping">Continue Shopping</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                ordersContainer.innerHTML = '';
+
+                // Sort orders by date (newest first)
+                const orders = [];
+                querySnapshot.forEach(doc => {
+                    orders.push({ id: doc.id, ...doc.data() });
+                });
+                
+                orders.sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds);
+
+                // Display each order
+                orders.forEach(order => {
+                    const orderDate = order.createdAt?.toDate 
+                        ? order.createdAt.toDate().toLocaleDateString() 
+                        : 'Date not available';
+
+                    const orderCard = document.createElement('div');
+                    orderCard.className = 'order-card';
+                    
+                    // Create order items HTML
+                    let itemsHTML = '';
+                    order.items.forEach(item => {
+                        itemsHTML += `
+                            <div class="order-item">
+                                <img src="https://via.placeholder.com/200" alt="${item.name}" class="item-image">
+                                <div class="item-info">
+                                    <h3 class="item-name">${item.name}</h3>
+                                    <div class="item-price">$${item.price.toFixed(2)} × ${item.quantity}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    // Get status class
+                    let statusClass = 'status-processing';
+                    if (order.status === 'shipped') statusClass = 'status-shipped';
+                    else if (order.status === 'delivered') statusClass = 'status-delivered';
+                    else if (order.status === 'cancelled') statusClass = 'status-cancelled';
+
+                    orderCard.innerHTML = `
+                        <div class="order-header">
+                            <div>
+                                <span class="order-id">Order #${order.id.substring(0, 8)}</span>
+                                <span class="order-date">Placed on ${orderDate}</span>
+                            </div>
+                            <span class="order-status ${statusClass}">${order.status || 'processing'}</span>
+                        </div>
+                        <div class="order-details">
+                            <div class="order-items">
+                                ${itemsHTML}
+                            </div>
+                            <div class="order-summary">
+                                <div class="summary-row">
+                                    <span>Subtotal</span>
+                                    <span>$${order.subtotal.toFixed(2)}</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Shipping</span>
+                                    <span>$${order.shipping.toFixed(2)}</span>
+                                </div>
+                                <div class="summary-row summary-total">
+                                    <span>Total</span>
+                                    <span>$${order.total.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    ordersContainer.appendChild(orderCard);
+                });
+            } catch (error) {
+                console.error("Error loading orders:", error);
+                ordersContainer.innerHTML = `
+                    <div class="empty-orders">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error loading your orders. Please try again later.</p>
+                        <a href="index.html" class="continue-shopping">Back to Home</a>
+                    </div>
+                `;
+            }
+        }
+
+        // Update cart count
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            document.querySelector('.cart-counter').textContent = count;
+        }
+
+        // Initialize
+        updateCartCount();
+    </script>
+</body>
+</html>

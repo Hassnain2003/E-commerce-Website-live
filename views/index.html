@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&Z Cartique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+ <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+<a href="index.html" class="logo">
+    <h1>D&Z Cartique</h1>
+</a>
+
+        <div class="header-links">
+            <a href="index.html">Home</a>
+            <a href="admin.html">Admin</a>
+            <a href="cart.html">Cart <span class="cart-counter">0</span></a>
+            <div class="profile-dropdown">
+                <a href="#" class="profile-link">
+                    <i class="fas fa-user"></i>
+                    <span class="username">Guest</span>
+                </a>
+<div class="dropdown-content">
+    <div class="user-info">
+        <p>Welcome, <span class="username">Guest</span></p>
+    </div>
+    <a href="orderhistory.html"><i class="fas fa-history"></i> Order History</a>
+    
+    <!-- Login link (shown only when not logged in) -->
+    <a href="login.html" id="login-link"><i class="fas fa-sign-in-alt"></i> Login</a>
+
+    <!-- Logout link (shown only when logged in) -->
+    <a href="#" id="logout-link" style="display: none;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+
+            </div>
+            <div class="search-bar">
+                <input type="text" id="searchBar" placeholder="Search products...">
+                <i class="fas fa-search"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Sidebar Section -->
+        <div class="sidebar">
+            <h3>Categories</h3>
+            <ul id="category-list">
+                <li><a href="#" data-category="all">All Products</a></li>
+                <li><a href="#" data-category="shirts">Shirts</a></li>
+                <li><a href="#" data-category="tshirts">T-Shirts</a></li>
+                <li><a href="#" data-category="pants-jeans">Pants & Jeans</a></li>
+                <li><a href="#" data-category="ethnic-wear">Ethnic Wear</a></li>
+                <li><a href="#" data-category="jackets-hoodies">Jackets & Hoodies</a></li>
+            </ul>
+        </div>
+
+        <!-- Featured Products Section -->
+        <div class="products">
+            <h2 id="category-title">All Products</h2>
+            <div class="product-list">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2025 D&Z Cartique. All rights reserved.</p>
+        <div>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact Us</a>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVtKArFOnaNNSY1nEESXB3cU0uozrjObQ",
+            authDomain: "dz-cartique.firebaseapp.com",
+            projectId: "dz-cartique",
+            storageBucket: "dz-cartique.appspot.com",
+            messagingSenderId: "558727334092",
+            appId: "1:558727334092:web:c5d3dee02a66e2a8c8da69"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // DOM Elements
+        const productList = document.querySelector('.product-list');
+        const loadingSpinner = document.querySelector('.loading-spinner');
+        const searchBar = document.getElementById('searchBar');
+        const categoryLinks = document.querySelectorAll('#category-list a');
+        const categoryTitle = document.getElementById('category-title');
+
+        // Current category state
+        let currentCategory = 'all';
+        let allProducts = [];
+
+        // Initialize cart count
+        updateCartCount();
+
+        // =====================
+        // 1. PRODUCT FETCH LOGIC
+        // =====================
+        async function fetchAllProducts() {
+            loadingSpinner.style.display = 'block';
+            productList.innerHTML = '';
+
+            try {
+                const snapshot = await db.collection('products')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                
+                allProducts = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                console.log('Fetched products:', allProducts); // Debug log
+                filterProductsByCategory(currentCategory);
+            } catch (error) {
+                console.error('Product fetch failed:', error);
+                productList.innerHTML = `
+                    <div class="error-message">
+                        <p>Failed to load products</p>
+                        <small>${error.message}</small>
+                        <button onclick="fetchAllProducts()">Retry</button>
+                    </div>
+                `;
+            } finally {
+                loadingSpinner.style.display = 'none';
+            }
+        }
+
+        // =====================
+        // 2. CATEGORY FILTERING
+        // =====================
+        function filterProductsByCategory(category) {
+            const filteredProducts = category === 'all' 
+                ? allProducts 
+                : allProducts.filter(product => product.category === category);
+            
+            renderProducts(filteredProducts);
+            updateCategoryTitle(category);
+        }
+
+        function updateCategoryTitle(category) {
+            const categoryNames = {
+                'all': 'All Products',
+                'shirts': 'Shirts',
+                'tshirts': 'T-Shirts',
+                'pants-jeans': 'Pants & Jeans',
+                'ethnic-wear': 'Ethnic Wear',
+                'jackets-hoodies': 'Jackets & Hoodies'
+            };
+            categoryTitle.textContent = categoryNames[category] || 'Products';
+        }
+
+        // =====================
+        // 3. PRODUCT RENDERING
+        // =====================
+        function renderProducts(products) {
+            if (products.length === 0) {
+                productList.innerHTML = '<p class="no-products">No products available in this category</p>';
+                return;
+            }
+
+            productList.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <img src="${product.imageUrl || `https://via.placeholder.com/300x200?text=${encodeURIComponent(product.name)}`}" 
+                         alt="${product.name}"
+                         onerror="this.src='https://via.placeholder.com/300x200?text=Product+Image'">
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p>${product.description || 'No description available'}</p>
+                        <div class="product-footer">
+                            <span class="product-price">PKR ${(product.price || 0).toFixed(2)}</span>
+                            <button class="add-to-cart" 
+                                    data-id="${product.id}" 
+                                    data-name="${product.name}" 
+                                    data-price="${product.price}">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            setupCartButtons();
+        }
+
+        // =====================
+        // 4. CART FUNCTIONALITY
+        // =====================
+        function setupCartButtons() {
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const product = {
+                        id: e.target.dataset.id,
+                        name: e.target.dataset.name,
+                        price: parseFloat(e.target.dataset.price),
+                        quantity: 1
+                    };
+
+                    addToCart(product);
+                });
+            });
+        }
+
+        function addToCart(product) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const existingItem = cart.find(item => item.id === product.id);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push(product);
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            showCartNotification(product.name);
+        }
+
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            document.querySelector('.cart-counter').textContent = count;
+        }
+
+        function showCartNotification(productName) {
+            const notification = document.createElement('div');
+            notification.className = 'cart-notification';
+            notification.innerHTML = `
+                <span>${productName} added to cart!</span>
+                <a href="cart.html">View Cart</a>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
+        }
+
+        // =====================
+        // 5. SEARCH FUNCTIONALITY
+        // =====================
+        searchBar.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const productCards = document.querySelectorAll('.product-card');
+
+            productCards.forEach(card => {
+                const name = card.querySelector('h3').textContent.toLowerCase();
+                const description = card.querySelector('p').textContent.toLowerCase();
+                
+                if (name.includes(searchTerm) || description.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // =====================
+        // 6. CATEGORY NAVIGATION
+        // =====================
+        categoryLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentCategory = e.target.dataset.category;
+                filterProductsByCategory(currentCategory);
+                
+                // Update active category style
+                categoryLinks.forEach(l => l.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+
+        // =====================
+        // 7. AUTH STATE HANDLING
+        // =====================
+ auth.onAuthStateChanged(user => {
+    const usernameElements = document.querySelectorAll('.username');
+    const loginLink = document.getElementById('login-link');
+    const logoutLink = document.getElementById('logout-link');
+
+    if (user) {
+        const displayName = user.displayName || user.email.split('@')[0];
+        usernameElements.forEach(el => el.textContent = displayName);
+        loginLink.style.display = 'none';
+        logoutLink.style.display = 'block';
+    } else {
+        usernameElements.forEach(el => el.textContent = 'Guest');
+        loginLink.style.display = 'block';
+        logoutLink.style.display = 'none';
+    }
+});
+
+        document.getElementById('logout')?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await auth.signOut();
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error("Logout error:", error);
+            }
+        });
+
+        // =====================
+        // 8. INITIALIZATION
+        // =====================
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAllProducts();
+            updateCartCount();
+            
+            // Set first category as active
+            document.querySelector('#category-list a[data-category="all"]').classList.add('active');
+        });
+    </script>
+</body>
+</html>
