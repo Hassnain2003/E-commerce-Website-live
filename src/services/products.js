@@ -32,6 +32,9 @@ export function normalizeProduct(product) {
     badge: typeof product.badge === 'string' ? product.badge : '',
     tags: Array.isArray(product.tags) ? product.tags.filter((tag) => typeof tag === 'string') : [],
     stock: Number.isFinite(Number(product.stock)) ? Math.max(0, Number(product.stock)) : null,
+    gallery: Array.isArray(product.gallery) ? product.gallery.filter((url) => typeof url === 'string') : [],
+    thumbnailUrl: typeof product.thumbnailUrl === 'string' ? product.thumbnailUrl : '',
+    altText: typeof product.altText === 'string' ? product.altText : '',
     createdAtValue: toTimestampValue(product.createdAt),
   };
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export function ProductGallery({ imageUrl, alt, thumbnails = [], width = 640 }) {
+export function ProductGallery({ imageUrl, alt, thumbnails = [], width = 640, sizes = '(max-width: 800px) 100vw, 50vw' }) {
   const fallbackImage = `https://placehold.co/${width}x800/e6dfd5/24211f?text=${encodeURIComponent(alt || 'Product')}`;
   const [mainImage, setMainImage] = useState(imageUrl || fallbackImage);
   const imageToLoad = mainImage || fallbackImage;
@@ -17,6 +17,7 @@ export function ProductGallery({ imageUrl, alt, thumbnails = [], width = 640 }) 
           alt={alt || 'Product'}
           className="product-gallery-image"
           loading="lazy"
+          sizes={sizes}
           onError={handleError}
           width={width}
         />
@@ -31,7 +32,7 @@ export function ProductGallery({ imageUrl, alt, thumbnails = [], width = 640 }) 
               onClick={() => setMainImage(thumb)}
               type="button"
             >
-              <img src={thumb} alt="" className="product-gallery-thumb-image" loading="lazy" />
+              <img src={thumb} alt="" className="product-gallery-thumb-image" loading="lazy" sizes="(max-width: 520px) 25vw, (max-width: 800px) 16vw, 8vw" />
             </button>
           ))}
         </div>

@@ -65,6 +65,11 @@ Existing product documents only need `name`, `description`, `price`, `category`,
 - `badge`: Short label such as `New` or `Limited`.
 - `tags`: Array of searchable product tags.
 - `stock`: Numeric inventory value; `0` displays a sold-out state.
+- `gallery`: Array of additional image URLs for the product detail image gallery.
+- `thumbnailUrl`: Preferred thumbnail URL used where a smaller product image is needed.
+- `altText`: Descriptive alt text for the product image (accessibility and fallback).
+
+Product images are served from Firebase Storage (`dz-cartique.appspot.com`) with download URLs stored in Firestore. The `imageUrl` field is preserved for backward compatibility; external URLs still work but Firebase Storage URLs are recommended for production reliability.
 
 Products are normalized at the service boundary so older documents remain compatible with the richer catalog experience.
 

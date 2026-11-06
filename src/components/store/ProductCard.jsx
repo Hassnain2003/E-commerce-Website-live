@@ -26,7 +26,7 @@ export function ProductCard({ product }) {
     <article className="product-card">
       <Link className="product-card-link" to={`/products/${product.id}`} aria-label={`View ${product.name} details`}>
         <div className="product-image-wrap">
-          <img src={image} alt={product.name} className="product-image" loading="lazy" onError={(event) => { event.currentTarget.src = fallbackImage; }} />
+          <img src={image} alt={product.name} className="product-image" loading="lazy" sizes="(max-width: 520px) 100vw, (max-width: 800px) 50vw, 33vw" onError={(event) => { event.currentTarget.src = fallbackImage; }} />
           <span className="product-category">{product.badge || product.category || 'Essential'}</span>
           {isSoldOut && <span className="product-stock-badge">Sold out</span>}
         </div>

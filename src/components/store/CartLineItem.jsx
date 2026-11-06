@@ -8,7 +8,7 @@ export function CartLineItem({ item }) {
 
   return (
     <article className="cart-line">
-      <img src={image} alt="" className="cart-line-image" onError={(event) => { event.currentTarget.src = fallbackImage; }} />
+      <img src={image} alt="" className="cart-line-image" loading="lazy" sizes="(max-width: 520px) 20vw, 10vw" onError={(event) => { event.currentTarget.src = fallbackImage; }} />
       <div className="cart-line-details">
         <p className="eyebrow">{item.category || 'D&Z essential'}</p>
         <h2>{item.name}</h2>
