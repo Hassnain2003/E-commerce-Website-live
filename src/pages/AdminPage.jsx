@@ -41,6 +41,7 @@ function initialDraft() {
     thumbnailUrl: '',
     altText: '',
     gallery: '',
+    compareAtPrice: '',
   };
 }
 
@@ -110,6 +111,7 @@ export function AdminPage() {
       thumbnailUrl: product.thumbnailUrl || '',
       altText: product.altText || '',
       gallery: (product.gallery || []).join('\n'),
+      compareAtPrice: product.compareAtPrice ?? '',
     });
     setShowCreateProduct(true);
   }
