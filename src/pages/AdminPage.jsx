@@ -65,7 +65,8 @@ function initialDraft() {
     imageUrl: '',
     thumbnailUrl: '',
     altText: '',
-    gallery: '',
+    gallery: [],
+    newGalleryImage: '',
   };
 }
 
@@ -201,6 +202,23 @@ export function AdminPage() {
     setDraft((current) => ({ ...current, [field]: value }));
   }
 
+  function setMainImage(index) {
+    const gallery = draft.gallery || [];
+    const newMain = gallery[index];
+    setDraft((current) => ({
+      ...current,
+      imageUrl: newMain,
+      gallery: gallery.filter((_, i) => i !== index),
+    }));
+  }
+
+  function removeGalleryImage(index) {
+    setDraft((current) => ({
+      ...current,
+      gallery: (current.gallery || []).filter((_, i) => i !== index),
+    }));
+  }
+
   function startCreateProduct() {
     setEditingProductId(null);
     setDraft(initialDraft());
@@ -208,6 +226,7 @@ export function AdminPage() {
   }
 
   function startEditProduct(product) {
+    const existingGallery = Array.isArray(product.gallery) ? product.gallery : (product.gallery ? String(product.gallery).split('\n').filter(Boolean) : []);
     setEditingProductId(product.id);
     setDraft({
       name: product.name || '',
@@ -222,7 +241,8 @@ export function AdminPage() {
       imageUrl: product.imageUrl || '',
       thumbnailUrl: product.thumbnailUrl || '',
       altText: product.altText || '',
-      gallery: (product.gallery || []).join('\n'),
+      gallery: existingGallery,
+      newGalleryImage: '',
     });
     setShowProductForm(true);
   }
@@ -243,7 +263,7 @@ export function AdminPage() {
       return;
     }
     const stock = draft.stock ? Math.max(0, Math.floor(Number(draft.stock))) : 0;
-    const gallery = draft.gallery.split('\n').map((u) => u.trim()).filter(Boolean);
+    const gallery = Array.isArray(draft.gallery) ? draft.gallery.filter((u) => typeof u === 'string' && u.trim()) : [];
     setSubmitError('');
     setSubmitSuccess('');
     try {
@@ -617,11 +637,11 @@ export function AdminPage() {
                 {filteredProducts.map((product) => {
                   const isSelected = selectedProductIds.has(product.id);
                   return (
-                    <article className={`admin-product-card ${isSelected ? 'selected' : ''}`} key={product.id}>
+                    <article className={`admin-product-card ${isSelected ? 'selected' : ''}`} key={product.id} onClick={(e) => { if (!e.target.closest('.admin-product-icon-wrap')) startEditProduct(product); }} role="button" tabIndex={0} style={{ cursor: 'pointer' }}>
                       <div className="admin-product-image">
                         <img src={product.imageUrl || ''} alt={product.name} loading="lazy" className="admin-product-main" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                         <div className="admin-product-icon-wrap">
-                          <Link className="admin-product-icon" to={`/products/${product.id}`} aria-label={`View ${product.name} in the store`}>
+                          <Link className="admin-product-icon" to={`/products/${product.id}`} aria-label={`View ${product.name} in the store`} onClick={(e) => e.stopPropagation()}>
                             <span aria-hidden="true">↗</span>
                           </Link>
                           <button className="admin-product-icon" onClick={(e) => { e.stopPropagation(); startEditProduct(product); }} aria-label={`Edit ${product.name}`} type="button">
@@ -695,7 +715,7 @@ export function AdminPage() {
                           <input
                             type="number"
                             min="0"
-                            value={product.stock ?? ''}
+                            value={draft[product.id] ?? product.stock ?? ''}
                             onChange={(e) => {
                               const val = Math.max(0, Math.floor(Number(e.target.value) || 0));
                               setDraft((d) => ({ ...d, [product.id]: val }));
@@ -707,6 +727,7 @@ export function AdminPage() {
                             onClick={() => {
                               const val = draft[product.id] ?? (product.stock ?? 0);
                               setSubmitError('');
+                              setSubmitSuccess('');
                               updateProduct(product.id, { stock: val }).then(() => {
                                 setSubmitSuccess(`Stock updated for "${product.name}".`);
                                 setTimeout(() => setSubmitSuccess(''), 3000);
@@ -1000,17 +1021,72 @@ export function AdminPage() {
                 <label>Featured
                   <input type="checkbox" checked={draft.featured} onChange={(e) => updateDraft('featured', e.target.checked)} />
                 </label>
-                <label>Image URL
+                <label>Main Image URL
                   <input value={draft.imageUrl} onChange={(e) => updateDraft('imageUrl', e.target.value)} placeholder="https://..." type="url" />
                 </label>
-                <label>Thumbnail URL
-                  <input value={draft.thumbnailUrl} onChange={(e) => updateDraft('thumbnailUrl', e.target.value)} placeholder="Optional" type="url" />
-                </label>
-                <label>Alt text
+                <label>Alt Text
                   <input value={draft.altText} onChange={(e) => updateDraft('altText', e.target.value)} placeholder="Descriptive alt text" type="text" />
                 </label>
-                <label>Gallery (one URL per line)
-                  <textarea value={draft.gallery} onChange={(e) => updateDraft('gallery', e.target.value)} placeholder="https://..." rows="4"></textarea>
+                <div style={{ marginBottom: '1rem' }}>
+                  <p style={{ fontSize: '0.62rem', color: 'var(--muted)', fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 0.5rem' }}>Image Gallery</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                    {(draft.gallery || []).map((imgUrl, idx) => (
+                      <div key={idx} style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                        <img
+                          src={imgUrl}
+                          alt={`Gallery ${idx + 1}`}
+                          style={{ width: '5rem', height: '6rem', objectFit: 'cover', borderRadius: '0.3rem', border: draft.imageUrl === imgUrl ? '2px solid var(--accent)' : '1px solid var(--line)', background: 'var(--paper-deep)' }}
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
+                        <div style={{ display: 'flex', gap: '0.25rem' }}>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setMainImage(idx); }}
+                            type="button"
+                            style={{ background: draft.imageUrl === imgUrl ? 'var(--accent)' : 'var(--paper-deep)', border: 'none', color: draft.imageUrl === imgUrl ? 'var(--paper)' : 'var(--ink)', padding: '0.2rem', borderRadius: '0.2rem', cursor: 'pointer', fontSize: '0.6rem' }}
+                            title={draft.imageUrl === imgUrl ? 'Main image' : 'Set as main'}
+                          >
+                            {draft.imageUrl === imgUrl ? '★ Main' : '☆ Main'}
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); removeGalleryImage(idx); }}
+                            type="button"
+                            style={{ background: 'transparent', border: 'none', color: 'var(--accent)', padding: '0.2rem', borderRadius: '0.2rem', cursor: 'pointer', fontSize: '0.6rem' }}
+                            title="Remove"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input
+                      type="url"
+                      placeholder="Add image URL…"
+                      value={draft.newGalleryImage}
+                      onChange={(e) => updateDraft('newGalleryImage', e.target.value)}
+                      style={{ flex: 1, padding: '0.5rem', border: '1px solid var(--line)', background: 'var(--paper-deep)', color: 'var(--ink)', fontFamily: 'var(--mono)', fontSize: '0.7rem' }}
+                    />
+                    <button
+                      className="solid-button"
+                      onClick={() => {
+                        const url = draft.newGalleryImage.trim();
+                        if (!url) return;
+                        setDraft((d) => ({
+                          ...d,
+                          gallery: [...(d.gallery || []), url],
+                          newGalleryImage: '',
+                        }));
+                      }}
+                      type="button"
+                      style={{ padding: '0.5rem 0.8rem', fontSize: '0.7rem' }}
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+                <label>Thumbnail URL
+                  <input value={draft.thumbnailUrl} onChange={(e) => updateDraft('thumbnailUrl', e.target.value)} placeholder="Optional" type="url" />
                 </label>
               </div>
               <div className="admin-product-form-actions">
